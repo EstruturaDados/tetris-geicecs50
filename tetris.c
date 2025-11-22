@@ -1,56 +1,97 @@
+#include <time.h>
 #include <stdio.h>
+#include <stdlib.h>
 
-// Desafio Tetris Stack
-// Tema 3 - Integração de Fila e Pilha
-// Este código inicial serve como base para o desenvolvimento do sistema de controle de peças.
-// Use as instruções de cada nível para desenvolver o desafio.
+typedef struct{
+    char tipo;
+    int id;
+} Peca;
 
-int main() {
+#define MAX 5
 
-    // 🧩 Nível Novato: Fila de Peças Futuras
-    //
-    // - Crie uma struct Peca com os campos: tipo (char) e id (int).
-    // - Implemente uma fila circular com capacidade para 5 peças.
-    // - Crie funções como inicializarFila(), enqueue(), dequeue(), filaCheia(), filaVazia().
-    // - Cada peça deve ser gerada automaticamente com um tipo aleatório e id sequencial.
-    // - Exiba a fila após cada ação com uma função mostrarFila().
-    // - Use um menu com opções como:
-    //      1 - Jogar peça (remover da frente)
-    //      0 - Sair
-    // - A cada remoção, insira uma nova peça ao final da fila.
+typedef struct {
+   Peca peca[MAX];
+   int inicio;
+   int final;
+   int total;
+} FilaDePecas;
 
+void menu(){
+    printf(".............. TETRIS STACK ..............\n");
+    printf("1 - jogar uma peça.\n");
+    printf("2 - inserir uma peça.\n");
+    printf("3 - ver o resultado.\n");
+    printf("0 - sair\n");
+    printf("..........................................\n");
+    printf("Escolha uma das opções acima: \n\n");
 
-
-    // 🧠 Nível Aventureiro: Adição da Pilha de Reserva
-    //
-    // - Implemente uma pilha linear com capacidade para 3 peças.
-    // - Crie funções como inicializarPilha(), push(), pop(), pilhaCheia(), pilhaVazia().
-    // - Permita enviar uma peça da fila para a pilha (reserva).
-    // - Crie um menu com opção:
-    //      2 - Enviar peça da fila para a reserva (pilha)
-    //      3 - Usar peça da reserva (remover do topo da pilha)
-    // - Exiba a pilha junto com a fila após cada ação com mostrarPilha().
-    // - Mantenha a fila sempre com 5 peças (repondo com gerarPeca()).
-
-
-    // 🔄 Nível Mestre: Integração Estratégica entre Fila e Pilha
-    //
-    // - Implemente interações avançadas entre as estruturas:
-    //      4 - Trocar a peça da frente da fila com o topo da pilha
-    //      5 - Trocar os 3 primeiros da fila com as 3 peças da pilha
-    // - Para a opção 4:
-    //      Verifique se a fila não está vazia e a pilha tem ao menos 1 peça.
-    //      Troque os elementos diretamente nos arrays.
-    // - Para a opção 5:
-    //      Verifique se a pilha tem exatamente 3 peças e a fila ao menos 3.
-    //      Use a lógica de índice circular para acessar os primeiros da fila.
-    // - Sempre valide as condições antes da troca e informe mensagens claras ao usuário.
-    // - Use funções auxiliares, se quiser, para modularizar a lógica de troca.
-    // - O menu deve ficar assim:
-    //      4 - Trocar peça da frente com topo da pilha
-    //      5 - Trocar 3 primeiros da fila com os 3 da pilha
-
-
-    return 0;
 }
 
+void iniciarFila(FilaDePecas *f){
+    f->final = 0;
+    f->inicio = 0;
+    f->total = 0;
+}
+
+void gerarPecas(FilaDePecas *f, Peca p){
+    if(f->total == MAX){
+        printf("Fila cheia.\n");
+    }
+
+    f->peca[f->final] = p;
+    // f->peca[f->final].id++;
+    f->final = (f->final +1) % MAX;
+    f->total++;
+}
+
+void removerPecas(FilaDePecas *f, Peca *p){
+    if(f->total == 0){
+        printf("Fila Vazia.\n"); 
+    }
+
+    *p = f->peca[f->inicio];
+    f->inicio = (f->inicio + 1) % MAX;
+    f->total--;
+}
+
+void mostrarFila(FilaDePecas *f){
+    if (f->total == 0){
+        printf("Nenhuma pessoa na fila.\n");
+        return;
+    }
+    printf("Fila completa:\n");
+    for (int i = 0, idx = f->inicio; i < f->total; i++, idx = (idx+1)%MAX){
+        printf("[%c | %d]\n", f->peca[idx].tipo, f->peca[idx].id);
+    }
+}
+
+int main(){
+    char pecasPossiveis[] = {'I', 'O', 'T', 'L'};
+
+    FilaDePecas fila;
+    iniciarFila(&fila);
+
+    Peca peca[MAX];
+
+    srand(time(NULL)); // fará com que os valores venham realmente aleatórios
+
+    for (int i = 0; i <= MAX; i++){
+        int indice = rand() % 4;
+        peca[i].tipo = pecasPossiveis[indice];
+        peca[i].id = i + 1;
+        // printf("Peça %d: %c (ID: %d)\n", i+1, peca[i].tipo, peca[i].id);
+    }
+
+    gerarPecas(&fila, peca[1]);
+    gerarPecas(&fila, peca[2]);
+    gerarPecas(&fila, peca[3]);
+    gerarPecas(&fila, peca[4]);
+    gerarPecas(&fila, peca[5]); 
+    gerarPecas(&fila, peca[6]); // vem vazio; para vir mais resultados, precisa aumentar o MAX ou alterar o for
+
+    mostrarFila(&fila);
+
+    menu();
+
+    return 0;
+};
